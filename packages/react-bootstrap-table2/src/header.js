@@ -22,7 +22,7 @@ const Header = (props) => {
     expandRow,
     bootstrap4
   } = props;
-
+  console.log(selectRow);
   return (
     <thead>
       <tr className={ className }>

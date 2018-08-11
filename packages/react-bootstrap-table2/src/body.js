@@ -21,7 +21,6 @@ const Body = (props) => {
     visibleColumnSize,
     cellEdit,
     selectRow,
-    selectedRowKeys,
     rowStyle,
     rowClasses,
     rowEvents,
@@ -48,7 +47,7 @@ const Body = (props) => {
       const editable = !(nonEditableRows.length > 0 && nonEditableRows.indexOf(key) > -1);
 
       const selected = selectRow.mode !== Const.ROW_SELECT_DISABLED
-        ? selectedRowKeys.includes(key)
+        ? selectRow.selected.includes(key)
         : null;
 
       const attrs = rowEvents || {};
@@ -124,8 +123,7 @@ Body.propTypes = {
   keyField: PropTypes.string.isRequired,
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
-  selectRow: PropTypes.object,
-  selectedRowKeys: PropTypes.array
+  selectRow: PropTypes.object
 };
 
 export default Body;

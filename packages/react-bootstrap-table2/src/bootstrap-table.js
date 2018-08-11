@@ -9,7 +9,7 @@ import Caption from './caption';
 import Body from './body';
 import PropsBaseResolver from './props-resolver';
 import Const from './const';
-import { getSelectionSummary } from './store/selection';
+import withSelection from './row-selection/with-selection';
 
 class BootstrapTable extends PropsBaseResolver(Component) {
   constructor(props) {
@@ -47,7 +47,7 @@ class BootstrapTable extends PropsBaseResolver(Component) {
       rowClasses,
       wrapperClasses,
       rowEvents,
-      selected
+      selectRow
     } = this.props;
 
     const tableWrapperClass = cs('react-bootstrap-table', wrapperClasses);
@@ -59,26 +59,17 @@ class BootstrapTable extends PropsBaseResolver(Component) {
       'table-condensed': condensed
     }, classes);
 
-    const cellSelectionInfo = this.resolveSelectRowProps({
-      onRowSelect: this.props.onRowSelect
-    });
-
-    const { allRowsSelected, allRowsNotSelected } = getSelectionSummary(data, keyField, selected);
-    const headerCellSelectionInfo = this.resolveSelectRowPropsForHeader({
-      onAllRowsSelect: this.props.onAllRowsSelect,
-      selected,
-      allRowsSelected,
-      allRowsNotSelected
-    });
-
     const tableCaption = (caption && <Caption>{ caption }</Caption>);
     const expandRow = this.resolveExpandRowProps();
+
+    const HeaderWrapper = selectRow ? withSelection(Header, selectRow) : Header;
+    const BodyWapper = selectRow ? withSelection(Body, selectRow) : Body;
 
     return (
       <div className={ tableWrapperClass }>
         <table id={ id } className={ tableClass }>
           { tableCaption }
-          <Header
+          <HeaderWrapper
             columns={ columns }
             className={ this.props.headerClasses }
             sortField={ this.props.sortField }
@@ -86,10 +77,9 @@ class BootstrapTable extends PropsBaseResolver(Component) {
             onSort={ this.props.onSort }
             onFilter={ this.props.onFilter }
             onExternalFilter={ this.props.onExternalFilter }
-            selectRow={ headerCellSelectionInfo }
             expandRow={ expandRow }
           />
-          <Body
+          <BodyWapper
             data={ data }
             keyField={ keyField }
             columns={ columns }
@@ -97,8 +87,6 @@ class BootstrapTable extends PropsBaseResolver(Component) {
             visibleColumnSize={ this.visibleColumnSize() }
             noDataIndication={ noDataIndication }
             cellEdit={ this.props.cellEdit || {} }
-            selectRow={ cellSelectionInfo }
-            selectedRowKeys={ selected }
             expandRow={ expandRow }
             rowStyle={ rowStyle }
             rowClasses={ rowClasses }
@@ -147,8 +135,6 @@ BootstrapTable.propTypes = {
     selectionRenderer: PropTypes.func,
     selectionHeaderRenderer: PropTypes.func
   }),
-  onRowSelect: PropTypes.func,
-  onAllRowsSelect: PropTypes.func,
   expandRow: PropTypes.shape({
     renderer: PropTypes.func.isRequired,
     expanded: PropTypes.array,
